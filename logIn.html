@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/dist/output.css" rel="stylesheet" />
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <nav
+      class="flex justify-between items-center w-full px-[2em] py-[1em] bg-[#2d2670]"
+    >
+      <h1 class="text-2xl text-white">Logo</h1>
+      <div class="flex justify-center items-center gap-6">
+        <button
+          class="flex bg-white px-[1.5em] py-[0.5em] rounded-lg font-medium"
+        >
+          SignUp
+        </button>
+        <button
+          class="flex bg-white px-[1.5em] py-[0.5em] rounded-lg font-medium"
+        >
+          SignIn
+        </button>
+      </div>
+    </nav>
+
+
+    <!-- Start of Login form -->
+    <main class="flex w-full min-h-[400px] justify-center items-center">
+        <form id="form" class="w-[50%] h-[70%] bg-[#2d2670] rounded-md flex flex-col px-[1em] py-6" >
+            <label class="text-xl text-white">
+                Eamil:
+            </label><br/>
+            <input id="email" class="border-2 w-[90%] rounded-md py-[0.3em] px-[1em]" type="text" placeholder="Enter your Email"/><br/>
+            <label class="text-xl text-white">
+                Password: 
+            </label><br/>
+            <input id="password" class="border-2 w-[90%] rounded-md py-[0.3em] px-[1em]" type="text" placeholder="Enter your Email"/><br/>
+            <button
+            id="btn"
+          class="flex bg-white px-[1.5em] py-[0.5em] rounded-lg font-medium w-[15%] flex justify-center items-center"
+        >
+          SignIn
+        </button>
+        </form>
+    </main>
+    <script src="main.js">
+
+    </script>
+  </body>
+</html>

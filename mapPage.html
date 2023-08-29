@@ -1,0 +1,152 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS Maps SDK for JavaScript Tutorials: Display a map</title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.27/"></script>
+
+    <script>
+
+
+        require(["esri/config", "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer" , "esri/rest/locator",  "esri/Graphic"], function(esriConfig, Map, MapView, FeatureLayer, locator , Graphic) {
+
+          const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer"
+
+
+
+          // This call back fun. >>  so that you can create the layers first without the map.add() function,  then you can add it in the map layer when creating the map.  
+          const trailheadsLayer = new FeatureLayer({
+              url: "https://geoportal.moid.gov.ae/moids/rest/services/SDI/New_PortalSDI_AR/MapServer/107",
+              id: "Roads"
+            });
+
+
+            const trailheadsLayer2 = new FeatureLayer({
+              url: "https://geoportal.moid.gov.ae/moids/rest/services/SDI/New_PortalSDI_AR/MapServer/139",
+              id: "Houses"
+            })
+
+            const pointGraphic = new Graphic({
+              symbol: { type: "simple-marker", color: "red", size: "12px" } // Customize the symbol as needed
+            })
+
+            let map = new Map({
+                basemap: "topo-vector",
+                layers: [trailheadsLayer , trailheadsLayer2] // Here we add the layers inside the map array. 
+            });
+            // Create the view: 
+            let view = new MapView({
+                container: "viewDiv",
+                map: map,
+                zoom: 10,
+                center: [
+        55.2920260601948,
+        25.19439606523053
+    ]
+            })
+
+            console.log(map.layers.length);            
+
+            const checkbox = document.getElementById("toggle");
+            trailheadsLayer2.visible = false // Give it initail value
+            console.log(trailheadsLayer2.url)
+
+            checkbox.addEventListener("change" , () => {
+              trailheadsLayer2.visible = checkbox.checked
+            })
+
+            const airPortsCheck = document.getElementById("Airports");
+
+            trailheadsLayer.visible = false;
+            airPortsCheck.addEventListener("change" , () => {
+              trailheadsLayer.visible = airPortsCheck.checked
+            })
+
+
+            // PopUp
+            // view.popupEnabled = false;
+
+            // view.on("click", (e) => {
+            //   // console.log(e.mapPoint)
+            //   const lat = Math.round(e.mapPoint.latitude * 1000) / 1000;
+            //   const lon = Math.round(e.mapPoint.longitude * 1000)/ 1000; 
+
+            //   view.openPopup({
+            //   title: `Latitude: ${lat} // Longitude: ${lon}`,
+            //   location: e.mapPoint
+            // });
+
+
+            // //Set the address >> هون يعني بدنا نمرق المكان يلي بنكبس عليه كا اريغيومنت لل فنكشين اسمه  .. >> LaocationToAddress 
+            // const params = {
+            //   location: e.mapPoint
+            // }
+
+            // locator.locationToAddress(locatorUrl,  params)
+            // .then((response) => {
+            //   view.popup.content = response.address
+            // })
+            // .catch(() => {
+            //   view.popup.content = "No address was found for this location"
+            // })
+            // })
+
+            // الان بدنا نعمل كويري بناء على النقطة يلي بنكبس عليها على الخريطة 
+            // راح نعمل فنكشين و نمرق اله النقطة يلي كبسنا عليها
+            const queryFeature = (layer , screenPoint) => {
+              const point = view.toMap(screenPoint) // => toMap >> عبارة عن ميثود للفيو عشان يحول النقطة العادية من البكسلز الى احداثيات لانو هاي الكويري تعتمد على المرجع المكاني
+
+              layer.queryFeatures({ // اللير هون يلي احنا دخلناها فوق و  هون كانك بتعمل سيليكت كويري و بتحدد الشروط يلي بدك اياها 
+                geometry: point,
+                spatialRelationship: "intersects", // >  يعني الميزات يلي راح تتقاطع هون مع النقطة هاي هي يلي راح يتم استرجاعها 
+                returnGeometry: false,
+                outFields: ["*"]
+              })
+              .then((featureSet) => {
+                pointGraphic.geometry = point;
+                view.graphics.add(pointGraphic)
+
+                view.openPopup({
+                location: point, 
+                features: featureSet.features
+              })
+              });
+
+              
+              
+            }
+
+            view.on("click", (e) => {
+              queryFeature(trailheadsLayer2, e.screenPoint)
+            })
+            
+        });
+
+
+       
+        
+
+
+      </script>
+
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+    <div style="margin: 1em; position: absolute; top: 0; right: 0;  padding: 0.5em 1em; background-color: rgb(45, 38, 112); color: white; border-radius:6px; opacity: 70%;">
+      <input id="toggle" type="checkbox"/> <label> beneficiaries layer</label><br/>
+      <input id="Airports" type="checkbox"/> <label> Airports  layer</label>
+    </div>
+  </body>
+</html>
